@@ -1,44 +1,47 @@
-const getParent = (parent, x) => {
-  if (parent[x] === x) return x;
-  return (parent[x] = getParent(parent, parent[x]));
-};
+function find(parents, i) {
+  if (parents[i] === i) return i;
+  return (parents[i] = find(parents, parents[i]));
+}
 
-const unionParent = (parent, a, b) => {
-  const n1 = getParent(parent, a);
-  const n2 = getParent(parent, b);
-  if (n1 < n2) return (parent[n2] = n1);
-  else return (parent[n1] = n2);
-};
+function union(parents, i1, i2) {
+  const p1 = parents[i1];
+  const p2 = parents[i2];
 
-const findParent = (parent, a, b) => {
-  const n1 = getParent(parent, a);
-  const n2 = getParent(parent, b);
-  if (n1 === n2) return true;
-  else return false;
-};
+  if (p1 > p2) parents[p1] = p2;
+  else parents[p2] = p1;
+}
+
+function hasSameParent(parents, i1, i2) {
+  const p1 = find(parents, i1);
+  const p2 = find(parents, i2);
+
+  return p1 === p2;
+}
 
 function solution(n, costs) {
   let answer = 0;
-  const parent = [];
-  for (let i = 0; i < n; i++) parent.push(i);
-
+  const parents = Array.from({ length: n }, (_, i) => i);
   costs.sort((a, b) => a[2] - b[2]);
 
   for (const cost of costs) {
-    if (!findParent(parent, cost[0], cost[1])) {
-      answer += cost[2];
-      unionParent(parent, cost[0], cost[1]);
+    const [i1, i2, c] = cost;
+
+    if (!hasSameParent(parents, i1, i2)) {
+      answer += c;
+      union(parents, i1, i2);
     }
   }
 
+  console.log(answer);
   return answer;
 }
 
-const answer = solution(4, [
+const n = 4;
+const costs = [
   [0, 1, 1],
   [0, 2, 2],
   [1, 2, 5],
   [1, 3, 1],
   [2, 3, 8],
-]);
-console.log(answer);
+];
+solution(n, costs);
