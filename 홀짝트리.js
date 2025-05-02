@@ -10,14 +10,16 @@ function solution(nodes, edges) {
     forest[w].add(v);
   }
 
+  const visited = new Set();
   // 하나씩 루트를 설정해보자
   for (const root of nodes) {
-    // root랑 자식들의 개수랑 홀짝여부가 같으면 isOddEven을 true로
-    let isOddEven = false;
-    if (checkIsOddEven(root, forest[root])) isOddEven = true;
+    if (visited.has(root)) continue;
 
-    const res = traverse(root, -1, isOddEven);
-    if (res) isOddEven ? (answer[0] += 1) : (answer[1] += 1);
+    visited.add(root);
+    const cntEvenOdd = makeTree(root);
+
+    if (cntEvenOdd[0] === 1) answer[0] += 1;
+    if (cntEvenOdd[1] === 1) answer[1] += 1;
   }
 
   return answer;
@@ -26,22 +28,25 @@ function solution(nodes, edges) {
     return root % 2 === childSet.size % 2;
   }
 
-  function traverse(root, parent, isOddEven) {
-    const stack = [[root, parent]];
+  function makeTree(root) {
+    const stack = [root];
+    const cntEvenOdd = [0, 0]; // [홀짝 개수, 역홀짝 개수]
 
     while (stack.length) {
-      const [node, parent] = stack.pop();
-      const childs = new Set([...forest[node]]);
-      childs.delete(parent);
+      const node = stack.pop();
+      const childs = forest[node];
 
-      if (checkIsOddEven(node, childs) !== isOddEven) return false;
+      checkIsOddEven(node, childs) ? (cntEvenOdd[0] += 1) : (cntEvenOdd[1] += 1);
 
       childs.forEach(child => {
-        stack.push([child, node]);
+        if (!visited.has(child)) {
+          stack.push(child);
+          visited.add(child);
+        }
       });
     }
 
-    return true;
+    return cntEvenOdd;
   }
 }
 
