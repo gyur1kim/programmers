@@ -19,12 +19,12 @@ function solution(line) {
   const answer = [];
 
   for (let i = maxY; i >= minY; i--) {
-    const res = [];
+    const line = [];
     for (let j = minX; j <= maxX; j++) {
-      if (intersection.filter(([x, y]) => x === j && y === i).length) res.push("*");
-      else res.push(".");
+      if (intersection.filter(([x, y]) => x === j && y === i).length) line.push("*");
+      else line.push(".");
     }
-    answer.push(res.join(""));
+    answer.push(line.join(""));
   }
 
   return answer;
