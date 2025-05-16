@@ -1,9 +1,11 @@
 class PriorityQueue {
-  constructor() {
+  constructor(isMinHeap = true) {
     this.queue = [];
+    this.isMinHeap = isMinHeap;
   }
 
   enqueue(item) {
+    if (!this.isMinHeap) item *= -1;
     this.queue.push(item);
     this.heapifyUp();
   }
@@ -19,7 +21,7 @@ class PriorityQueue {
       this.heapifyDown();
     }
 
-    return item;
+    return this.isMinHeap ? item : item * -1;
   }
 
   isEmpty() {
@@ -84,8 +86,8 @@ class PriorityQueue {
 
 function solution(operations) {
   // pq는 최소힙으로 구현됨
-  const MAX_PQ = new PriorityQueue(); // -1을 곱해서, 큰 값이 위로 오게 할거임
-  const MIN_PQ = new PriorityQueue();
+  const MAX_PQ = new PriorityQueue(false);
+  const MIN_PQ = new PriorityQueue(true);
   const numMap = new Map();
 
   for (const operation of operations) {
@@ -94,60 +96,36 @@ function solution(operations) {
 
     switch (o) {
       case "I":
-        MAX_PQ.enqueue(val * -1);
+        MAX_PQ.enqueue(val);
         MIN_PQ.enqueue(val);
         numMap.set(val, (numMap.get(val) || 0) + 1);
         break;
       case "D":
         // 작은 값을 빼세요
-        if (val === -1) {
-          getMin();
-        }
+        if (val === -1) dequeueVal(MIN_PQ);
         // 큰 값을 빼세요
-        else {
-          getMax();
-        }
+        else dequeueVal(MAX_PQ);
     }
   }
 
-  const min = getMin();
-  if (min === null) return [0, 0];
+  if (numMap.size === 0) return [0, 0];
 
-  const max = getMax();
-  if (max === null) return [min, min];
+  const min = dequeueVal(MIN_PQ);
+  const max = dequeueVal(MAX_PQ);
+
+  if (max === null || min === null) return [min, min];
   return [max, min];
 
-  function getMin() {
-    while (!MIN_PQ.isEmpty()) {
-      const min = MIN_PQ.dequeue();
+  function dequeueVal(PQ) {
+    while (!PQ.isEmpty()) {
+      const item = PQ.dequeue();
 
-      if (!numMap.has(min)) continue;
+      if (!numMap.has(item)) continue;
 
-      const cnt = numMap.get(min);
-      if (cnt === 1) {
-        numMap.delete(min);
-      } else {
-        numMap.set(min, cnt - 1);
-      }
-      return min;
-    }
-    return null;
-  }
+      const cnt = numMap.get(item);
+      cnt === 1 ? numMap.delete(item) : numMap.set(item, cnt - 1);
 
-  function getMax() {
-    while (!MAX_PQ.isEmpty()) {
-      let max = MAX_PQ.dequeue() * -1;
-
-      if (!numMap.has(max)) continue;
-
-      const cnt = numMap.get(max);
-      if (cnt === 1) {
-        numMap.delete(max);
-      } else {
-        numMap.set(max, cnt - 1);
-      }
-
-      return max;
+      return item;
     }
     return null;
   }
