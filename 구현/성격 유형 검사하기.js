@@ -52,7 +52,6 @@
 //
 // console.log(solution(["TR", "RT", "TR"], [7, 1, 3]));
 
-
 /*
  * 이렇게 복잡하게 생각하지 않아도 됐다...
  * 입력값 처리하는 일을 너무 복잡하게 생각한듯..!!
@@ -60,12 +59,10 @@
 
 function solution(survey, choices) {
   const MBTI = {};
-  const types = ["RT","CF","JM","AN"];
+  const types = ["RT", "CF", "JM", "AN"];
 
   // MBTI Object를 만들건데, type 글자를 하나하나 쪼개 동적으로 만들 것이다.
-  types.forEach((type) =>
-    type.split('').forEach((char) => MBTI[char] = 0)
-  )
+  types.forEach(type => type.split("").forEach(char => (MBTI[char] = 0)));
 
   // 내가 선택한 점수를 가지고 할당할 것이다
   // 문자열도 구조 분해 할당이 되는 줄 몰랐다
@@ -75,7 +72,7 @@ function solution(survey, choices) {
   });
 
   // 다시 구조 분해 할당을 통해 더 큰 값을 얻은 성격 유형을 골라 출력
-  return types.map(([a, b]) => MBTI[b] > MBTI[a] ? b : a).join("");
+  return types.map(([a, b]) => (MBTI[b] > MBTI[a] ? b : a)).join("");
 }
 
 console.log(solution(["TR", "RT", "TR"], [7, 1, 3]));
